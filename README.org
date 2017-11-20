@@ -1,0 +1,146 @@
+#+Title: Package Reports
+
+This repository contains reports related to packages that are installed.
+
+* Count hosts with os PACKAGE version                                :ATTACH:
+:PROPERTIES:
+:ID:       35c58d68-db5d-416f-929a-7b44296cd465
+:Attachments: count-openssl-versions_2017-11-20_13-16-31.png
+:END:
+
+Report on the distribution of the version of a package reported to be installed.
+
+#+DOWNLOADED: file:///home/nickanderson/CFEngine/policy/cfengine-content/package-reports/count-openssl-versions.png @ 2017-11-20 13:16:33
+#+attr_org: :width 600
+#+attr_html: :width 600 
+[[file:data/35/c58d68-db5d-416f-929a-7b44296cd465/count-openssl-versions_2017-11-20_13-16-31.png]]
+
+Copy =[[file:templates/package-count-version-detailed.sql][package-count-version-detailed.sql]]= replacing =<PACKAGE>= with the package
+you want to report on. Add as Custom Report in Mission Portal.
+
+#+BEGIN_SRC sql :tangle ./templates/package-count-version-detailed.sql
+  WITH
+    s AS (
+      SELECT DISTINCT ON (hostkey)
+        hostkey,
+        softwareversion AS version,
+        substring(softwareversion from '^[0-9.]+') AS shortversion,
+        softwarearchitecture AS arch
+      FROM
+        software
+      WHERE
+        softwarename = '<PACKAGE>'
+      ORDER BY
+        hostkey ASC,
+        arch DESC,
+        version DESC
+    )
+  SELECT
+    count(hostkey) AS "Hosts running this version",
+    (CASE WHEN version IS NULL THEN 'Not installed' ELSE version END) AS "Package Version"
+  FROM
+    hosts
+    NATURAL LEFT JOIN s
+  GROUP BY
+    version
+  ORDER BY
+    version ASC
+#+END_SRC
+
+* PACKAGE version summary                                            :ATTACH:
+:PROPERTIES:
+:ID:       0b196b0c-38bb-4110-969e-e833b8f96851
+:Attachments: Rsync-Summary_2017-11-20_14-07-26.png
+:END:
+
+This report differs from the previous report in that only the package version
+string is used and the rest of the package version string is truncated.
+
+#+DOWNLOADED: file:///home/nickanderson/CFEngine/policy/cfengine-content/package-reports/Rsync-Summary.png @ 2017-11-20 14:07:28
+#+attr_org: :width 600
+#+attr_html: :width 600 
+[[file:data/0b/196b0c-38bb-4110-969e-e833b8f96851/Rsync-Summary_2017-11-20_14-07-26.png]]
+
+Copy =[[file:templates/package-version-summary.sql][package-version-summary.sql]]= replacing =<PACKAGE>= with the package you want
+to report on. Add as Custom Report in Mission Portal.
+
+#+BEGIN_SRC sql :tangle ./templates/package-version-summary.sql
+  -- Return the count of hosts for each version of <PACKAGE> installed
+  
+  WITH
+    s AS (
+      SELECT DISTINCT ON (hostkey)
+        hostkey,
+        softwareversion AS version,
+        substring(softwareversion from '^[0-9.]+') AS shortversion,
+        softwarearchitecture AS arch
+      FROM
+        software
+      WHERE
+        softwarename = '<PACKAGE>'
+      ORDER BY
+        hostkey ASC,
+        arch DESC,
+        version DESC
+    )
+  SELECT
+    count(hostkey) AS "Hosts running this version",
+    (CASE WHEN shortversion IS NULL THEN 'Not installed' ELSE shortversion END) AS "Package Version"
+  FROM
+    hosts
+    NATURAL LEFT JOIN s
+  GROUP BY
+    shortversion
+  ORDER BY
+    shortversion ASC
+#+END_SRC
+
+* Host details for PACKAGE                                           :ATTACH:
+:PROPERTIES:
+:ID:       b89795ce-6482-421a-84dc-6e6f61dfc705
+:Attachments: Rsync-Details_2017-11-20_13-19-24.png
+:END:
+
+Detailed report including the hostname, IP Address, os package version and host
+architecture.
+
+#+DOWNLOADED: file:///home/nickanderson/CFEngine/policy/cfengine-content/package-reports/Rsync-Details.png @ 2017-11-20 13:19:24
+#+attr_org: :width 600
+#+attr_html: :width 600 
+[[file:data/b8/9795ce-6482-421a-84dc-6e6f61dfc705/Rsync-Details_2017-11-20_13-19-24.png]]
+
+Copy =[[file:templates/host-details-package-version.sql][host-details-package-version.sql]]= replacing =<PACKAGE>= with the package
+you wish to filter your report for. Add as Custom Report in Mission Portal.
+ 
+#+BEGIN_SRC sql :tangle ./templates/host-details-package-version.sql
+  -- Return the Hostname, IP, Detailed Package Version, and Host Architecutre for
+  -- hosts having <PACKAGE> installed.
+   
+  WITH
+    s AS (
+      SELECT DISTINCT ON (hostkey)
+        hostkey,
+        softwareversion AS version,
+        substring(softwareversion from '^[0-9.]+') AS shortversion,
+        softwarearchitecture AS arch
+      FROM
+        software
+      WHERE
+        softwarename = '<PACKAGE>'
+      ORDER BY
+        hostkey ASC,
+        arch DESC,
+        version DESC
+    )
+  SELECT
+    h.hostname AS "Host Name",
+    h.ipaddress AS "IP Address",
+    (CASE WHEN s.version IS NULL THEN 'Not installed' ELSE s.version END) AS "Package Version",
+    s.arch AS "Architecture"
+  FROM
+    hosts AS h
+    NATURAL LEFT JOIN s
+  ORDER BY
+    h.ipaddress::inet
+#+END_SRC
+
