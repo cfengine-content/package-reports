@@ -15,7 +15,7 @@ Report on the distribution of the version of a package reported to be installed.
 #+attr_html: :width 600 
 [[file:data/35/c58d68-db5d-416f-929a-7b44296cd465/count-openssl-versions_2017-11-20_13-16-31.png]]
 
-Copy =[[file:templates/package-count-version-detailed.sql][package-count-version-detailed.sql]]= replacing =<PACKAGE>= with the package
+Copy =[[./templates/package-count-version-detailed.sql][package-count-version-detailed.sql]]= replacing =<PACKAGE>= with the package
 you want to report on. Add as Custom Report in Mission Portal.
 
 #+BEGIN_SRC sql :tangle ./templates/package-count-version-detailed.sql
@@ -61,7 +61,7 @@ string is used and the rest of the package version string is truncated.
 #+attr_html: :width 600 
 [[file:data/0b/196b0c-38bb-4110-969e-e833b8f96851/Rsync-Summary_2017-11-20_14-07-26.png]]
 
-Copy =[[file:templates/package-version-summary.sql][package-version-summary.sql]]= replacing =<PACKAGE>= with the package you want
+Copy =[[./templates/package-version-summary.sql][package-version-summary.sql]]= replacing =<PACKAGE>= with the package you want
 to report on. Add as Custom Report in Mission Portal.
 
 #+BEGIN_SRC sql :tangle ./templates/package-version-summary.sql
@@ -109,7 +109,7 @@ architecture.
 #+attr_html: :width 600 
 [[file:data/b8/9795ce-6482-421a-84dc-6e6f61dfc705/Rsync-Details_2017-11-20_13-19-24.png]]
 
-Copy =[[file:templates/host-details-package-version.sql][host-details-package-version.sql]]= replacing =<PACKAGE>= with the package
+Copy =[[./templates/host-details-package-version.sql][host-details-package-version.sql]]= replacing =<PACKAGE>= with the package
 you wish to filter your report for. Add as Custom Report in Mission Portal.
  
 #+BEGIN_SRC sql :tangle ./templates/host-details-package-version.sql
